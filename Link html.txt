@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Biomass Tractor Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --surface: #ffffff;
+    --surface-2: #f1f5f9;
+    --border: #e6ebf2;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-soft: #94a3b8;
+    --primary: #16a34a;
+    --primary-soft: #dcfce7;
+    --primary-dark: #15803d;
+    --accent: #0ea5e9;
+    --accent-soft: #e0f2fe;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.08);
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(1200px 600px at 90% -10%, #e0f2fe 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, #dcfce7 0%, transparent 55%),
+      var(--bg);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary) 0%, #22c55e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.25);
+  }
+  .brand-logo svg { width: 24px; height: 24px; color: white; }
+  .brand-text h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .brand-text p {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+    font-weight: 500;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
+  }
+
+  /* HERO */
+  .hero { margin-bottom: 36px; }
+  .hero h2 {
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin: 0 0 10px;
+    line-height: 1.15;
+  }
+  .hero h2 .accent {
+    background: linear-gradient(120deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero .sub-th {
+    color: var(--text-muted);
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0 0 8px;
+  }
+  .hero p {
+    color: var(--text-muted);
+    max-width: 720px;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; }
+    .container { padding: 32px 16px 60px; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 0;
+  }
+
+  .section-card { margin-bottom: 20px; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title small {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .card-title .num {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .section { margin-bottom: 18px; }
+  .section:last-child { margin-bottom: 0; }
+
+  .section-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  .section-label label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+  .hint.green { color: var(--primary-dark); font-weight: 600; }
+
+  /* INPUTS */
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .input-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 540px) {
+    .input-row, .input-row-3 { grid-template-columns: 1fr; }
+  }
+
+  .field { position: relative; }
+
+  .input {
+    width: 100%;
+    padding: 12px 14px;
+    padding-right: 50px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all 0.18s ease;
+    outline: none;
+    appearance: none;
+    -moz-appearance: textfield;
+    font-variant-numeric: tabular-nums;
+  }
+  .input::-webkit-outer-spin-button,
+  .input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .input:hover { border-color: #cbd5e1; }
+  .input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12);
+  }
+  .input-unit {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--text-soft);
+    font-weight: 600;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* BOILER LIST */
+  .boiler-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .boiler-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .boiler-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    min-width: 86px;
+    text-align: center;
+  }
+  .remove-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+  }
+  .remove-btn:hover {
+    color: var(--danger);
+    border-color: #fecaca;
+    background: #fef2f2;
+  }
+  .remove-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .add-btn {
+    margin-top: 12px;
+    width: 100%;
+    padding: 11px;
+    background: var(--surface);
+    color: var(--primary-dark);
+    border: 1px dashed #bbf7d0;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .add-btn:hover {
+    background: var(--primary-soft);
+    border-style: solid;
+  }
+
+  /* FUEL ROW */
+  .fuel-block {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .fuel-block:last-child { margin-bottom: 0; }
+  .fuel-block-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fuel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .fuel-dot.bagasse { background: #84cc16; }
+  .fuel-dot.leaves  { background: #f59e0b; }
+
+  /* Compacted / Uncompacted toggle */
+  .fuel-type-toggle {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px;
+    margin-bottom: 14px;
+    gap: 2px;
+  }
+  .fuel-type-toggle button {
+    border: none;
+    background: transparent;
+    padding: 7px 16px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+  }
+  .fuel-type-toggle button small {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+  .fuel-type-toggle button:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+  .fuel-type-toggle button.active {
+    background: linear-gradient(135deg, var(--primary) 0%, #22c55e 100%);
+    color: white;
+    box-shadow: 0 3px 8px rgba(22, 163, 74, 0.28);
+  }
+  .fuel-type-toggle button.active:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  }
+
+  .fuel-stat-row {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .fuel-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .fuel-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .fuel-stat-label small { font-weight: 400; color: var(--text-soft); text-transform: none; letter-spacing: 0; }
+  .fuel-stat-val {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .fuel-stat-val small { color: var(--text-muted); font-weight: 500; font-size: 11px; margin-left: 2px; }
+  @media (max-width: 540px) {
+    .fuel-stat-row { grid-template-columns: 1fr; }
+  }
+
+  /* ACTION BUTTONS */
+  .action-row {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 540px) {
+    .action-row { grid-template-columns: 1fr; }
+  }
+  .calc-btn {
+    padding: 14px 20px;
+    background: linear-gradient(135deg, var(--primary) 0%, #22c55e 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.28);
+  }
+  .calc-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(22, 163, 74, 0.34);
+  }
+  .calc-btn:active { transform: translateY(0); }
+  .calc-btn.flash { animation: pulse 0.45s ease; }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45); }
+    100% { box-shadow: 0 0 0 18px rgba(22, 163, 74, 0); }
+  }
+  .reset-btn {
+    padding: 14px 18px;
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .reset-btn:hover {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: #cbd5e1;
+  }
+
+  /* RESULT CARD */
+  .result-card {
+    background: linear-gradient(160deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 24px;
+  }
+  .result-card.updated .result-headline .value {
+    animation: bump 0.5s ease;
+  }
+  @keyframes bump {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  .result-headline {
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+    border: 1px solid #d1fae5;
+    border-radius: var(--radius-md);
+    padding: 22px;
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .result-headline .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary-dark);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .result-headline .label-th {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .result-headline .value {
+    font-size: 60px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(120deg, var(--primary-dark) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .result-headline .unit {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  /* RESULT TABLES */
+  .result-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .result-table-header {
+    background: var(--surface-2);
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-table-body { padding: 4px 0; }
+  .result-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 10px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .key { color: var(--text-muted); font-weight: 500; }
+  .result-row .key small { color: var(--text-soft); font-size: 11px; font-weight: 500; display: block; }
+  .result-row .val {
+    color: var(--text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .result-row .val small {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+  .result-row.total {
+    background: #f0fdf4;
+    font-weight: 700;
+  }
+  .result-row.total .key { color: var(--primary-dark); font-weight: 700; }
+  .result-row.total .val { color: var(--primary-dark); }
+
+  /* COST ROW */
+  .cost-row {
+    background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-md);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .cost-row .cost-label {
+    font-size: 12px;
+    color: #92400e;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .cost-row .cost-label-th {
+    font-size: 11px;
+    color: #b45309;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .cost-row .cost-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #78350f;
+    letter-spacing: -0.02em;
+    margin-top: 4px;
+  }
+  .cost-row .cost-icon {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--warn);
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+  }
+
+  /* ALERTS */
+  .alert {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .alert-info {
+    background: var(--accent-soft);
+    color: #075985;
+    border: 1px solid #bae6fd;
+  }
+  .alert-warn {
+    background: #fff7ed;
+    color: #9a3412;
+    border: 1px solid #fed7aa;
+  }
+  .alert svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+
+  .ico { width: 16px; height: 16px; }
+  .th { font-family: 'Sarabun', sans-serif; }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M5 8c0 4 3 7 7 7s7-3 7-7"/><path d="M9 22h6"/><path d="M12 15v7"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Pro Phader</h1>
+        </div>
+      </div>
+      <div class="badge">Excel-matched formulas</div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <h2>Biomass Tractor <span class="accent">Calculator</span></h2>
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+      <!-- INPUT COLUMN -->
+      <div>
+
+        <!-- SECTION 1: Boiler & Distance -->
+        <div class="card section-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <span class="num">1</span>
+              Boiler & Distance
+              <small class="th">· ข้อมูลการเดินเครื่องและระยะทาง</small>
+            </h3>
+            <span class="hint green" id="boilerSum">Total: 0 t-steam/hr</span>
+          </div>
+
+          <div class="boiler-list" id="boilerList"></div>
+          <button class="add-btn" id="addBoiler">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add boiler
+          </button>
+
+          <div style="height: 18px;"></div>
+
+          <div class="section">
+            <div class="input-row">
+              <div>
+                <div class="section-label">
+                  <label for="distance">Distance <small class="th" style="font-weight:400;color:var(--text-soft)">ระยะทาง (เที่ยวไป)</small></label>
+                </div>
+                <div class="field">
+                  <input class="input" type="number" id="distance" value="60" min="0" step="1" />
+                  <span class="input-unit">m</span>
+                </div>
+              </div>
+              <div>
+                <div class="section-label">
+                  <label for="speed">Average Speed <small class="th" style="font-weight:400;color:var(--text-soft)">ความเร็วเฉลี่ย</small></label>
+                </div>
+                <div class="field">
+                  <input class="input" type="number" id="speed" value="2.4" min="0" step="0.1" />
+                  <span class="input-unit">km/h</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Fuel Mix -->
+        <div class="card section-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <span class="num">2</span>
+              Fuel Mix
+              <small class="th">· สัดส่วนการผสมเชื้อเพลิง</small>
+            </h3>
+            <span class="hint" id="fuelTotal">Total: 100%</span>
+          </div>
+
+          <div class="fuel-block">
+            <h4 class="fuel-block-title"><span class="fuel-dot bagasse"></span> Bagasse <span class="th" style="color:var(--text-muted);font-weight:500">· ชานอ้อย</span></h4>
+            <div class="fuel-type-toggle" data-fuel="bagasse" data-target="densBagasse">
+              <button type="button" class="active" data-density="315">บดอัด <small>Compacted</small></button>
+              <button type="button" data-density="240">ไม่บดอัด <small>Uncompacted</small></button>
+            </div>
+            <div class="input-row-3">
+              <div>
+                <div class="section-label"><label>Proportion</label></div>
+                <div class="field">
+                  <input class="input" type="number" id="propBagasse" value="60" min="0" max="100" step="1" />
+                  <span class="input-unit">%</span>
+                </div>
+              </div>
+              <div>
+                <div class="section-label"><label>LHV</label></div>
+                <div class="field">
+                  <input class="input" type="number" id="lhvBagasse" value="7700" min="1" step="10" />
+                  <span class="input-unit">kJ/kg</span>
+                </div>
+              </div>
+              <div>
+                <div class="section-label"><label>Density</label></div>
+                <div class="field">
+                  <input class="input" type="number" id="densBagasse" value="315" min="1" step="1" />
+                  <span class="input-unit">kg/m³</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fuel-block">
+            <h4 class="fuel-block-title"><span class="fuel-dot leaves"></span> Sugarcane Leaves <span class="th" style="color:var(--text-muted);font-weight:500">· ใบอ้อย</span></h4>
+            <div class="fuel-type-toggle" data-fuel="leaves" data-target="densLeaves">
+              <button type="button" data-density="240">บดอัด <small>Compacted</small></button>
+              <button type="button" class="active" data-density="80">ไม่บดอัด <small>Uncompacted</small></button>
+            </div>
+            <div class="input-row-3">
+              <div>
+                <div class="section-label"><label>Proportion</label></div>
+                <div class="field">
+                  <input class="input" type="number" id="propLeaves" value="40" min="0" max="100" step="1" />
+                  <span class="input-unit">%</span>
+                </div>
+              </div>
+              <div>
+                <div class="section-label"><label>LHV</label></div>
+                <div class="field">
+                  <input class="input" type="number" id="lhvLeaves" value="12000" min="1" step="10" />
+                  <span class="input-unit">kJ/kg</span>
+                </div>
+              </div>
+              <div>
+                <div class="section-label"><label>Density</label></div>
+                <div class="field">
+                  <input class="input" type="number" id="densLeaves" value="80" min="1" step="1" />
+                  <span class="input-unit">kg/m³</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Vehicle & Cost -->
+        <div class="card section-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <span class="num">3</span>
+              Vehicle & Cost
+              <small class="th">· รถดันและต้นทุน</small>
+            </h3>
+          </div>
+
+          <div class="section">
+            <div class="input-row">
+              <div>
+                <div class="section-label">
+                  <label for="hours">Working Hours <small class="th" style="font-weight:400;color:var(--text-soft)">ชั่วโมงต่อวัน</small></label>
+                </div>
+                <div class="field">
+                  <input class="input" type="number" id="hours" value="24" min="1" max="24" step="1" />
+                  <span class="input-unit">hr/day</span>
+                </div>
+              </div>
+              <div>
+                <div class="section-label">
+                  <label for="costRate">Cost Rate <small class="th" style="font-weight:400;color:var(--text-soft)">ราคาต่อชั่วโมง</small></label>
+                </div>
+                <div class="field">
+                  <input class="input" type="number" id="costRate" value="1313" min="0" step="1" />
+                  <span class="input-unit">฿/hr</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button class="reset-btn" id="resetBtn" type="button">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              Reset
+            </button>
+            <button class="calc-btn" id="calcBtn" type="button">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="14" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/><line x1="14" y1="15" x2="16" y2="15"/></svg>
+              Calculate
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS COLUMN -->
+      <div class="result-card">
+
+        <div class="result-headline">
+          <div class="label">Required Vehicles</div>
+          <div class="label-th th">จำนวนรถดันที่ต้องใช้</div>
+          <div class="value" id="vehiclesValue">0</div>
+          <div class="unit" id="vehiclesUnit">units</div>
+        </div>
+
+        <!-- Trip & Demand summary -->
+        <div class="result-table">
+          <div class="result-table-header">Operation Summary</div>
+          <div class="result-table-body">
+            <div class="result-row">
+              <span class="key">Total steam demand <small class="th">รวม Load ทั้งหมด</small></span>
+              <span class="val"><span id="totalDemand">0.00</span> <small>t-steam/hr</small></span>
+            </div>
+            <div class="result-row">
+              <span class="key">Round-trip time <small class="th">เวลาไป-กลับ</small></span>
+              <span class="val"><span id="tripTimeFmt">0:00</span> <small>min</small></span>
+            </div>
+            <div class="result-row">
+              <span class="key">Trips per hour <small class="th">เที่ยวต่อชั่วโมง</small></span>
+              <span class="val"><span id="trips">0</span> <small>trips/hr</small></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fuel Demand -->
+        <div class="result-table">
+          <div class="result-table-header">Fuel Weight Required · น้ำหนักเชื้อเพลิงที่ต้องใช้</div>
+          <div class="result-table-body">
+            <div class="result-row">
+              <span class="key"><span class="fuel-dot bagasse" style="margin-right:8px"></span>Bagasse <small class="th">ชานอ้อย</small></span>
+              <span class="val"><span id="fuelBagasse">0.00</span> <small>t/hr</small></span>
+            </div>
+            <div class="result-row">
+              <span class="key"><span class="fuel-dot leaves" style="margin-right:8px"></span>Sugarcane Leaves <small class="th">ใบอ้อย</small></span>
+              <span class="val"><span id="fuelLeaves">0.00</span> <small>t/hr</small></span>
+            </div>
+            <div class="result-row total">
+              <span class="key">Total fuel <small>· รวม</small></span>
+              <span class="val"><span id="fuelTotalAmt">0.00</span> <small>t/hr</small></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capacity -->
+        <div class="result-table">
+          <div class="result-table-header">Vehicle Capacity · ความสามารถรถดัน (per vehicle)</div>
+          <div class="result-table-body">
+            <div class="result-row">
+              <span class="key"><span class="fuel-dot bagasse" style="margin-right:8px"></span>Bagasse capacity</span>
+              <span class="val"><span id="capBagasse">0.00</span> <small>t/hr</small></span>
+            </div>
+            <div class="result-row">
+              <span class="key"><span class="fuel-dot leaves" style="margin-right:8px"></span>Sugarcane Leaves capacity</span>
+              <span class="val"><span id="capLeaves">0.00</span> <small>t/hr</small></span>
+            </div>
+            <div class="result-row">
+              <span class="key">Vehicle utilization <small class="th">การใช้รถ</small></span>
+              <span class="val"><span id="utilization">0.0</span><small>%</small></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost -->
+        <div class="cost-row">
+          <div>
+            <div class="cost-label">Estimated Daily Cost</div>
+            <div class="cost-label-th th">ค่าใช้จ่ายทั้งหมดต่อวัน</div>
+            <div class="cost-value" id="dailyCost">฿ 0</div>
+          </div>
+          <div class="cost-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+        </div>
+
+        <div id="alertBox"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Formulas match the reference Excel sheet · ผลคำนวณตรงกับไฟล์ Excel · Validate against on-site field data before procurement.
+    </div>
+  </div>
+
+<script>
+  // =============================================================
+  //  HELPER FUNCTIONS (declared with `function` so they're hoisted)
+  // =============================================================
+  function fmt(n, d = 2) {
+    if (!isFinite(n)) return '—';
+    return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function fmtInt(n) {
+    return isFinite(n) ? Math.round(n).toLocaleString('en-US') : '—';
+  }
+  function fmtCurrency(n) {
+    return isFinite(n) ? '฿ ' + Math.round(n).toLocaleString('en-US') : '฿ —';
+  }
+  function fmtMinSec(minutes) {
+    if (!isFinite(minutes) || minutes < 0) return '—';
+    const totalSec = Math.round(minutes * 60);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+  function showAlert(type, message) {
+    const icon = type === 'warn'
+      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+    document.getElementById('alertBox').innerHTML =
+      `<div class="alert alert-${type}">${icon}<span>${message}</span></div>`;
+  }
+  function clearAlert() {
+    document.getElementById('alertBox').innerHTML = '';
+  }
+
+  // =============================================================
+  //  BOILER ROW MANAGEMENT
+  // =============================================================
+  let boilerCount = 0;
+  const boilerListEl = document.getElementById('boilerList');
+
+  function addBoiler(value = '', labelOverride = null) {
+    boilerCount++;
+    const row = document.createElement('div');
+    row.className = 'boiler-row';
+    row.innerHTML = `
+      <span class="boiler-label">${labelOverride || ('Boiler ' + (boilerListEl.children.length + 1))}</span>
+      <div class="field">
+        <input class="input boiler-input" type="number" min="0" step="0.1" value="${value}" placeholder="0.0" />
+        <span class="input-unit">t-steam/hr</span>
+      </div>
+      <button class="remove-btn" title="Remove">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      </button>
+    `;
+    boilerListEl.appendChild(row);
+    const bInput = row.querySelector('.boiler-input');
+    bInput.addEventListener('input', calculate);
+    bInput.addEventListener('change', calculate);
+    row.querySelector('.remove-btn').addEventListener('click', () => {
+      if (boilerListEl.children.length <= 1) return;
+      row.remove();
+      relabelBoilers();
+      calculate();
+    });
+  }
+  function relabelBoilers() {
+    [...boilerListEl.children].forEach((row, i) => {
+      row.querySelector('.boiler-label').textContent = `Boiler ${i + 1}`;
+    });
+    [...boilerListEl.children].forEach(r => {
+      r.querySelector('.remove-btn').disabled = boilerListEl.children.length <= 1;
+    });
+  }
+  document.getElementById('addBoiler').addEventListener('click', () => {
+    addBoiler();
+    relabelBoilers();
+    calculate();
+  });
+
+  // =============================================================
+  //  CORE CALCULATION — mirrors the reference Excel
+  // =============================================================
+  // -------- Fixed engineering constants (matches Excel 3) --------
+  // Steam-to-fuel ratio for the reference fuel (bagasse):
+  // 1 ton of bagasse produces 2.6 tons of steam.
+  const STEAM_TO_FUEL_RATIO = 2.6;
+  // Volume of fuel pushed per round-trip (m³). Reference Excel 3:
+  // base capacity 773 t/hr at d=3m, density=315 kg/m³, speed=2.4 km/h.
+  // Equivalent bucket volume = 773 ÷ (400 trips/hr × 315 kg/m³ ÷ 1000) = 6.135 m³.
+  const BUCKET_VOLUME_M3 = 6.135;
+
+  function calculate() {
+    // ---- Inputs ----
+    const boilerInputs = [...boilerListEl.querySelectorAll('.boiler-input')];
+    const totalSteam = boilerInputs.reduce((s, el) => s + (parseFloat(el.value) || 0), 0);
+
+    const distance     = parseFloat(document.getElementById('distance').value) || 0;
+    const speedKmh     = parseFloat(document.getElementById('speed').value) || 0;
+    const hours        = parseFloat(document.getElementById('hours').value) || 0;
+    const costRate     = parseFloat(document.getElementById('costRate').value) || 0;
+
+    const propBagasse  = parseFloat(document.getElementById('propBagasse').value) || 0;
+    const lhvBagasse   = parseFloat(document.getElementById('lhvBagasse').value) || 0;
+    const densBagasse  = parseFloat(document.getElementById('densBagasse').value) || 0;
+    const propLeaves   = parseFloat(document.getElementById('propLeaves').value) || 0;
+    const lhvLeaves    = parseFloat(document.getElementById('lhvLeaves').value) || 0;
+    const densLeaves   = parseFloat(document.getElementById('densLeaves').value) || 0;
+
+    // ---- Boiler total label ----
+    document.getElementById('boilerSum').textContent =
+      `Total: ${fmt(totalSteam, 2)} t-steam/hr`;
+
+    // ---- Fuel proportions (Excel uses raw %, NOT normalized) ----
+    const propSum = propBagasse + propLeaves;
+    document.getElementById('fuelTotal').textContent = `Total: ${propSum}%`;
+
+    // ---- Round-trip time (Excel section 1) ----
+    // Excel E6:  (distance × 2) ÷ (speed_km/h × 1000 / 60)  →  minutes
+    const speedMpm = (speedKmh * 1000) / 60;                              // m/min
+    const tripTime = speedMpm > 0 ? (2 * distance) / speedMpm : Infinity; // minutes
+    const tripsPerHour = tripTime > 0 ? 60 / tripTime : 0;
+
+    // ---- Weight ratio (Excel section 2, column D) ----
+    // ratio_i = LHV_i ÷ LHV_bagasse (bagasse is reference, ratio = 1)
+    const ratioBagasse = 1;
+    const ratioLeaves  = lhvBagasse > 0 ? lhvLeaves / lhvBagasse : 0;
+
+    // ---- Fuel weight required (Excel section 2, column E) ----
+    // Excel: fuel_i = (Steam ÷ 2.6) × (prop_i ÷ 100) ÷ (LHV_i ÷ LHV_bagasse)
+    // Equivalent: fuel_i = Steam × (prop_i/100) × LHV_bagasse ÷ (2.6 × LHV_i)
+    const fuelBagasse = (lhvBagasse > 0)
+      ? (totalSteam / STEAM_TO_FUEL_RATIO) * (propBagasse / 100) / ratioBagasse
+      : 0;
+    const fuelLeaves  = (lhvLeaves > 0 && ratioLeaves > 0)
+      ? (totalSteam / STEAM_TO_FUEL_RATIO) * (propLeaves / 100) / ratioLeaves
+      : 0;
+    const fuelTotalAmt = fuelBagasse + fuelLeaves;
+
+    // ---- Vehicle capacity per fuel (Excel section 3) ----
+    // capacity_i (t/hr) = trips/hr × bucket_volume × density_i ÷ 1000
+    const capBagasse = tripsPerHour * BUCKET_VOLUME_M3 * densBagasse / 1000;
+    const capLeaves  = tripsPerHour * BUCKET_VOLUME_M3 * densLeaves  / 1000;
+
+    // ---- Vehicles needed (Excel section 4) ----
+    // sum of vehicle fractions per fuel, then CEIL
+    let fraction = 0;
+    if (capBagasse > 0) fraction += fuelBagasse / capBagasse;
+    if (capLeaves  > 0) fraction += fuelLeaves  / capLeaves;
+    const vehicles = (totalSteam > 0 && fraction > 0) ? Math.ceil(fraction) : 0;
+    const utilization = vehicles > 0 ? (fraction / vehicles) * 100 : 0;
+
+    // ---- Daily cost (Excel section 5) ----
+    const dailyCost = vehicles * hours * costRate;
+
+    // =========== RENDER ===========
+    document.getElementById('totalDemand').textContent  = fmt(totalSteam, 2);
+    document.getElementById('tripTimeFmt').textContent  = fmtMinSec(tripTime);
+    document.getElementById('trips').textContent        = fmt(tripsPerHour, 1);
+
+    document.getElementById('fuelBagasse').textContent  = fmt(fuelBagasse, 2);
+    document.getElementById('fuelLeaves').textContent   = fmt(fuelLeaves, 2);
+    document.getElementById('fuelTotalAmt').textContent = fmt(fuelTotalAmt, 2);
+
+    document.getElementById('capBagasse').textContent   = fmt(capBagasse, 2);
+    document.getElementById('capLeaves').textContent    = fmt(capLeaves, 2);
+    document.getElementById('utilization').textContent  = fmt(utilization, 1);
+
+    document.getElementById('vehiclesValue').textContent = fmtInt(vehicles);
+    document.getElementById('vehiclesUnit').textContent  =
+      vehicles === 1 ? 'unit' : 'units';
+    document.getElementById('dailyCost').textContent = fmtCurrency(dailyCost);
+
+    // ---- Alerts ----
+    clearAlert();
+    if (totalSteam <= 0) {
+      showAlert('info', 'Enter at least one boiler load to begin · กรุณาใส่ค่า Boiler load');
+    } else if (propSum !== 100) {
+      showAlert('warn', `Fuel proportions sum to ${propSum}% — they should total 100% for accurate fuel weight.`);
+    } else if (!isFinite(tripTime) || tripTime === 0) {
+      showAlert('warn', 'Vehicle speed and distance must be greater than zero.');
+    } else if (vehicles >= 5) {
+      showAlert('warn', `High vehicle requirement (${vehicles} units). Consider reducing distance or increasing speed.`);
+    } else {
+      showAlert('info', `Fleet of ${vehicles} vehicle${vehicles>1?'s':''} runs at ${fmt(utilization,1)}% utilization — handling ${fmt(fuelTotalAmt,2)} t/hr of fuel.`);
+    }
+  }
+
+  // =============================================================
+  //  INITIALIZATION (runs once, after every function is defined)
+  // =============================================================
+
+  // Seed with the boilers shown in the reference Excel
+  addBoiler(120, 'Boiler 11');
+  addBoiler(120, 'Boiler 12');
+  addBoiler(170, 'Boiler 21');
+  // Re-label them 1, 2, 3 so the UI stays consistent if user adds/removes
+  relabelBoilers();
+
+  // Wire up all parameter inputs
+  ['distance','speed','hours','costRate',
+   'propBagasse','lhvBagasse','densBagasse',
+   'propLeaves','lhvLeaves','densLeaves'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', calculate);
+    el.addEventListener('change', calculate);
+  });
+
+  // Calculate / Reset buttons
+  const calcBtn   = document.getElementById('calcBtn');
+  const resetBtn  = document.getElementById('resetBtn');
+  const resultCard = document.querySelector('.result-card');
+
+  calcBtn.addEventListener('click', () => {
+    calculate();
+    calcBtn.classList.remove('flash');
+    void calcBtn.offsetWidth;
+    calcBtn.classList.add('flash');
+    resultCard.classList.remove('updated');
+    void resultCard.offsetWidth;
+    resultCard.classList.add('updated');
+    if (window.innerWidth < 980) {
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    document.getElementById('distance').value     = 60;
+    document.getElementById('speed').value        = 2.4;
+    document.getElementById('hours').value        = 24;
+    document.getElementById('costRate').value     = 1313;
+    document.getElementById('propBagasse').value  = 60;
+    document.getElementById('lhvBagasse').value   = 7700;
+    document.getElementById('densBagasse').value  = 315;
+    document.getElementById('propLeaves').value   = 40;
+    document.getElementById('lhvLeaves').value    = 12000;
+    document.getElementById('densLeaves').value   = 80;
+    boilerListEl.innerHTML = '';
+    addBoiler(120);
+    addBoiler(120);
+    addBoiler(170);
+    relabelBoilers();
+    calculate();
+  });
+
+  // Press Enter inside any input → Calculate
+  document.querySelectorAll('.input').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); calcBtn.click(); }
+    });
+  });
+
+  // Fuel type toggle (Compacted / Uncompacted)
+  // Updates the density input to the preset value, then recalculates.
+  document.querySelectorAll('.fuel-type-toggle').forEach(toggle => {
+    toggle.addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn || btn.classList.contains('active')) return;
+      // swap active state
+      toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // auto-fill the density input
+      const targetId = toggle.dataset.target;
+      const density  = btn.dataset.density;
+      const densInput = document.getElementById(targetId);
+      if (densInput && density != null) {
+        densInput.value = density;
+      }
+      calculate();
+    });
+  });
+
+  // First render
+  calculate();
+</script>
+</body>
+</html>
