@@ -45,16 +45,132 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 /* LAYOUT */
 .app-body{display:flex;flex:1;overflow:hidden}
 
-/* SIDEBAR */
-.sidebar{width:var(--sidebar);background:white;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-label{font-size:9px;font-weight:700;color:var(--gray-mid);text-transform:uppercase;letter-spacing:0.8px;padding:14px 14px 5px}
+/* ===== SIDEBAR ===== */
+:root{
+  --sb-expanded:220px;
+  --sb-collapsed:56px;
+  --sb-mobile:260px;
+  --sb-transition:0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.sidebar{
+  width:var(--sb-expanded);
+  background:white;
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;
+  transition:width var(--sb-transition);
+  overflow:hidden;
+  position:relative;
+  z-index:100;
+}
+.sidebar.collapsed{width:var(--sb-collapsed)}
+
+/* section label — hidden when collapsed */
+.sidebar-label{
+  font-size:9px;font-weight:700;color:var(--gray-mid);
+  text-transform:uppercase;letter-spacing:0.8px;
+  padding:14px 14px 5px;
+  white-space:nowrap;overflow:hidden;
+  transition:opacity var(--sb-transition),padding var(--sb-transition);
+}
+.sidebar.collapsed .sidebar-label{opacity:0;padding:14px 14px 5px;pointer-events:none}
+
 .sidebar-nav{display:flex;flex-direction:column;padding:3px 7px;gap:2px;flex:1}
-.tab-btn{display:flex;align-items:center;gap:9px;padding:9px 11px;cursor:pointer;border:none;background:none;font-family:var(--font);font-size:12px;font-weight:500;color:var(--gray-mid);border-radius:6px;transition:all 0.15s;text-align:left;width:100%}
+
+.tab-btn{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 11px;cursor:pointer;
+  border:none;background:none;
+  font-family:var(--font);font-size:12px;font-weight:500;
+  color:var(--gray-mid);border-radius:6px;
+  transition:all 0.15s;text-align:left;width:100%;
+  white-space:nowrap;overflow:hidden;
+  min-height:40px;
+}
 .tab-btn:hover{background:var(--gray-bg);color:var(--gray-dark)}
 .tab-btn.active{background:var(--green-light);color:var(--green);font-weight:600}
 .tab-btn.active i{color:var(--green)}
-.tab-btn i{font-size:17px;flex-shrink:0;color:var(--gray-mid)}
-.tab-badge{background:var(--green);color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:auto}
+.tab-btn i{font-size:18px;flex-shrink:0;color:var(--gray-mid);min-width:18px}
+.tab-btn .btn-label{transition:opacity var(--sb-transition),width var(--sb-transition);overflow:hidden}
+.tab-badge{
+  background:var(--green);color:white;font-size:9px;font-weight:700;
+  padding:1px 5px;border-radius:8px;margin-left:auto;flex-shrink:0;
+  transition:opacity var(--sb-transition);
+  white-space:nowrap;
+}
+
+/* collapsed: hide labels and badges */
+.sidebar.collapsed .btn-label{opacity:0;width:0;margin:0}
+.sidebar.collapsed .tab-badge{opacity:0;width:0;padding:0;margin:0}
+.sidebar.collapsed .tab-btn{justify-content:center;gap:0;padding:9px 0}
+
+/* tooltip on collapsed hover */
+.sidebar.collapsed .tab-btn{position:relative}
+.sidebar.collapsed .tab-btn::after{
+  content:attr(data-label);
+  position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);
+  background:var(--gray-dark);color:white;font-size:11px;font-weight:500;
+  padding:5px 9px;border-radius:5px;white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity 0.15s;
+  z-index:999;box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+.sidebar.collapsed .tab-btn:hover::after{opacity:1}
+
+/* sidebar bottom toggle button */
+.sidebar-toggle-btn{
+  display:flex;align-items:center;justify-content:center;
+  padding:10px;margin:6px 7px 10px;
+  border:1px solid var(--border);border-radius:6px;
+  background:none;cursor:pointer;color:var(--gray-mid);
+  font-size:16px;transition:all 0.15s;font-family:var(--font);
+  gap:7px;font-size:13px;font-weight:500;
+  white-space:nowrap;overflow:hidden;
+}
+.sidebar-toggle-btn:hover{background:var(--gray-bg);color:var(--gray-dark);border-color:var(--gray-mid)}
+.sidebar-toggle-btn i{font-size:16px;flex-shrink:0;transition:transform var(--sb-transition)}
+.sidebar.collapsed .sidebar-toggle-btn .stb-label{opacity:0;width:0;overflow:hidden;margin:0}
+.sidebar.collapsed .sidebar-toggle-btn i{transform:rotate(180deg)}
+.stb-label{transition:opacity var(--sb-transition),width var(--sb-transition)}
+
+/* ===== MOBILE OVERLAY ===== */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  z-index:299;opacity:0;transition:opacity 0.25s;
+}
+.sidebar-overlay.open{opacity:1}
+
+/* hamburger in header */
+.btn-hamburger{
+  display:none;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:7px;
+  border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.08);color:white;
+  cursor:pointer;font-size:18px;flex-shrink:0;
+  transition:background 0.15s;margin-right:4px;
+}
+.btn-hamburger:hover{background:rgba(255,255,255,0.18)}
+
+/* MOBILE breakpoint */
+@media(max-width:700px){
+  :root{--sidebar:0px}
+  .btn-hamburger{display:flex}
+  #sidebar-collapse-btn{display:none !important}
+  .sidebar{
+    position:fixed;top:54px;left:0;bottom:0;
+    width:var(--sb-mobile) !important;
+    transform:translateX(-100%);
+    transition:transform var(--sb-transition);
+    z-index:300;box-shadow:4px 0 20px rgba(0,0,0,0.18);
+    /* always show labels on mobile */
+  }
+  .sidebar.mobile-open{transform:translateX(0)}
+  .sidebar-overlay{display:block}
+  /* always show labels on mobile regardless of collapsed state */
+  .sidebar.mobile-open .btn-label{opacity:1 !important;width:auto !important;margin:unset !important}
+  .sidebar.mobile-open .tab-badge{opacity:1 !important;width:auto !important;padding:1px 5px !important;margin-left:auto !important}
+  .sidebar.mobile-open .tab-btn{justify-content:flex-start !important;gap:9px !important;padding:9px 11px !important}
+  .sidebar.mobile-open .sidebar-label{opacity:1 !important}
+  .sidebar-toggle-btn{display:none}
+}
 
 /* MAIN */
 .main-content{flex:1;overflow-y:auto;padding:16px}
@@ -270,6 +386,12 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 <!-- HEADER -->
 <div class="header">
   <div class="header-left">
+    <button class="btn-hamburger" id="hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Open menu">
+      <i class="ti ti-menu-2"></i>
+    </button>
+    <button class="btn-header" id="sidebar-collapse-btn" onclick="toggleSidebar()" style="display:flex;align-items:center;gap:5px;margin-right:4px" title="Toggle sidebar">
+      <i class="ti ti-layout-sidebar-left-collapse" id="sidebar-collapse-icon"></i>
+    </button>
     <div class="logo-box"><i class="ti ti-building-factory-2"></i></div>
     <div>
       <div class="brand-title">FUEL YARD MANAGEMENT SYSTEM</div>
@@ -285,25 +407,32 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   </div>
 </div>
 
+<!-- MOBILE OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
 <!-- GLOBAL KPI removed -->
 
 <div class="app-body">
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-label">เมนู</div>
     <nav class="sidebar-nav">
-      <button class="tab-btn active" onclick="switchTab(0,this)">
-        <i class="ti ti-bulldozer"></i><span>Bulldozer Calculator</span>
+      <button class="tab-btn active" data-label="Bulldozer Calculator" onclick="switchTab(0,this)">
+        <i class="ti ti-bulldozer"></i><span class="btn-label">Bulldozer Calculator</span>
       </button>
-      <button class="tab-btn" onclick="switchTab(1,this)">
-        <i class="ti ti-building-warehouse"></i><span>Indoor Forecast</span>
+      <button class="tab-btn" data-label="Indoor Forecast" onclick="switchTab(1,this)">
+        <i class="ti ti-building-warehouse"></i><span class="btn-label">Indoor Forecast</span>
         <span class="tab-badge" id="badge-in">—</span>
       </button>
-      <button class="tab-btn" onclick="switchTab(2,this)">
-        <i class="ti ti-trees"></i><span>Outdoor Forecast</span>
+      <button class="tab-btn" data-label="Outdoor Forecast" onclick="switchTab(2,this)">
+        <i class="ti ti-trees"></i><span class="btn-label">Outdoor Forecast</span>
         <span class="tab-badge" id="badge-out">—</span>
       </button>
     </nav>
+    <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+      <i class="ti ti-chevrons-left"></i>
+      <span class="stb-label">Collapse</span>
+    </button>
   </div>
 
   <div class="main-content">
@@ -970,7 +1099,51 @@ function switchTab(idx,btn){
   document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // close mobile sidebar on nav
+  closeMobileSidebar();
 }
+
+// ===== SIDEBAR COLLAPSE (desktop) =====
+const SIDEBAR_KEY = 'fym_sidebar_collapsed';
+function toggleSidebar(){
+  const sb = document.getElementById('sidebar');
+  const isCollapsed = sb.classList.toggle('collapsed');
+  localStorage.setItem(SIDEBAR_KEY, isCollapsed ? '1' : '0');
+  updateCollapseIcon(isCollapsed);
+}
+function updateCollapseIcon(collapsed){
+  const icon = document.getElementById('sidebar-collapse-icon');
+  if(icon){
+    icon.className = collapsed
+      ? 'ti ti-layout-sidebar-left-expand'
+      : 'ti ti-layout-sidebar-left-collapse';
+  }
+}
+function initSidebarState(){
+  const saved = localStorage.getItem(SIDEBAR_KEY);
+  if(saved === '1'){
+    const sb = document.getElementById('sidebar');
+    sb.classList.add('collapsed');
+    updateCollapseIcon(true);
+  }
+}
+
+// ===== MOBILE SIDEBAR =====
+function toggleMobileSidebar(){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const isOpen = sb.classList.toggle('mobile-open');
+  ov.classList.toggle('open', isOpen);
+}
+function closeMobileSidebar(){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.remove('mobile-open');
+  ov.classList.remove('open');
+}
+
+// Init on load
+initSidebarState();
 
 // ===== BOILER RENDERERS =====
 function renderBoilerList(containerId, arr, arrName, calcFn){
