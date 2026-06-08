@@ -8,6 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+/* Eliminate 300ms tap delay on all interactive elements */
+a,button,input,select,textarea,[onclick],[role="button"]{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:rgba(0,0,0,0);
+}
 :root{
   --green:#1a7a38;--green-light:#e5f4ea;--green-dark:#145929;
   --gray-dark:#1e2a35;--gray-mid:#546e7a;--gray-light:#eceff1;--gray-bg:#f0f2f5;
@@ -17,7 +22,7 @@
   --font:'IBM Plex Sans','IBM Plex Sans Thai',sans-serif;
   --sidebar:200px;
 }
-body{font-family:var(--font);background:var(--gray-bg);color:var(--gray-dark);font-size:13px;min-height:100vh;display:flex;flex-direction:column}
+body{font-family:var(--font);background:var(--gray-bg);color:var(--gray-dark);font-size:13px;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
 input[type=number]{-moz-appearance:textfield}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
@@ -43,7 +48,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .kpi-unit{font-size:9px;color:rgba(255,255,255,0.4);margin-left:2px}
 
 /* LAYOUT */
-.app-body{display:flex;flex:1;overflow:hidden}
+.app-body{display:flex;flex:1;min-height:0}
 
 /* ===== SIDEBAR ===== */
 :root{
@@ -133,10 +138,19 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 
 /* ===== MOBILE OVERLAY ===== */
 .sidebar-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
-  z-index:299;opacity:0;transition:opacity 0.25s;
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:299;
+  opacity:0;
+  transition:opacity 0.25s;
+  pointer-events:none; /* CRITICAL: never block touches when invisible */
+  -webkit-tap-highlight-color:transparent;
 }
-.sidebar-overlay.open{opacity:1}
+.sidebar-overlay.open{
+  opacity:1;
+  pointer-events:auto; /* only intercept taps when actually open */
+}
 
 /* hamburger in header */
 .btn-hamburger{
@@ -154,26 +168,42 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   :root{--sidebar:0px}
   .btn-hamburger{display:flex}
   #sidebar-collapse-btn{display:none !important}
+
+  /* Body: don't block scrolling */
+  body{overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
   .sidebar{
     position:fixed;top:54px;left:0;bottom:0;
     width:var(--sb-mobile) !important;
     transform:translateX(-100%);
     transition:transform var(--sb-transition);
-    z-index:300;box-shadow:4px 0 20px rgba(0,0,0,0.18);
-    /* always show labels on mobile */
+    z-index:300;
+    box-shadow:4px 0 20px rgba(0,0,0,0.18);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
   }
   .sidebar.mobile-open{transform:translateX(0)}
-  .sidebar-overlay{display:block}
-  /* always show labels on mobile regardless of collapsed state */
-  .sidebar.mobile-open .btn-label{opacity:1 !important;width:auto !important;margin:unset !important}
-  .sidebar.mobile-open .tab-badge{opacity:1 !important;width:auto !important;padding:1px 5px !important;margin-left:auto !important}
-  .sidebar.mobile-open .tab-btn{justify-content:flex-start !important;gap:9px !important;padding:9px 11px !important}
-  .sidebar.mobile-open .sidebar-label{opacity:1 !important}
+
+  /* Overlay: use display:block always on mobile, controlled by pointer-events+opacity */
+  .sidebar-overlay{display:block !important}
+
+  /* Always show labels on mobile regardless of collapsed state */
+  .sidebar .btn-label{opacity:1 !important;width:auto !important;margin:unset !important}
+  .sidebar .tab-badge{opacity:1 !important;width:auto !important;padding:1px 5px !important;margin-left:auto !important}
+  .sidebar .tab-btn{justify-content:flex-start !important;gap:9px !important;padding:10px 12px !important;min-height:48px !important}
+  .sidebar .sidebar-label{opacity:1 !important}
   .sidebar-toggle-btn{display:none}
+
+  /* Touch targets: minimum 44px for all interactive elements */
+  .tab-btn,.btn-add,.btn-remove,.type-btn,.btn-header{min-height:44px;min-width:44px}
+  .boiler-input{min-height:44px}
+
+  /* Fuel props: 2 columns on mobile */
+  .fuel-props{grid-template-columns:1fr 1fr !important}
 }
 
 /* MAIN */
-.main-content{flex:1;overflow-y:auto;padding:16px}
+.main-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;-webkit-overflow-scrolling:touch;min-width:0}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 
@@ -329,6 +359,28 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start}
 .input-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+@media(max-width:700px){
+  /* Stack all two/three column grids into single column */
+  .two-col,.three-col{grid-template-columns:1fr !important;gap:12px}
+  .input-row{grid-template-columns:1fr !important;gap:8px}
+  /* KPI forecast grid: 2 columns on mobile instead of 3 */
+  .fkpi-grid{grid-template-columns:repeat(2,1fr) !important}
+  /* Result grid stays 2 col but allow natural sizing */
+  .result-grid{grid-template-columns:repeat(2,1fr)}
+  /* Allow panels to breathe on small screens */
+  .panel,.panel-input,.panel-result,.panel-forecast{padding:12px}
+  /* Zone tables: make them horizontally scrollable */
+  .zone-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
+  /* Hero number slightly smaller */
+  .hero-dozer .hd-num{font-size:48px}
+  .hero-cost .hc-num{font-size:26px}
+  /* Main content padding tighter on mobile */
+  .main-content{padding:10px}
+  /* tab panels need full width */
+  .tab-panel.active{width:100%}
+}
+
 /* ===== ZONE MAP WIDGET ===== */
 .zone-map-widget{
   background:#fff;border:1px solid var(--border);border-radius:10px;
@@ -408,7 +460,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 </div>
 
 <!-- MOBILE OVERLAY -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <!-- GLOBAL KPI removed -->
 
@@ -678,6 +730,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 
           <div class="panel panel-forecast" style="margin-top:12px">
             <div class="section-title"><i class="ti ti-table"></i>Indoor Zone Fuel Inventory <small style="color:var(--gray-mid);font-weight:400;font-size:10px">(แก้ไขได้ — คำนวณอัตโนมัติ)</small></div>
+            <div class="zone-tbl-wrap">
             <table class="zone-tbl">
               <thead><tr><th>Zone</th><th>Fuel Qty (ton)</th><th>Avg. Dist (m)</th><th>Days</th><th>End Date</th><th>Cost (THB)</th></tr></thead>
               <tbody id="in-zone-table"></tbody>
@@ -690,6 +743,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
                 <td id="in-total-cost-tbl" style="font-weight:700;color:#ea580c">—</td>
               </tr></tfoot>
             </table>
+            </div>
           </div>
         </div>
 
@@ -865,6 +919,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 
           <div class="panel panel-forecast" style="margin-top:12px">
             <div class="section-title"><i class="ti ti-table"></i>Outdoor Zone Fuel Inventory <small style="color:var(--gray-mid);font-weight:400;font-size:10px">(แก้ไขได้ — คำนวณอัตโนมัติ)</small></div>
+            <div class="zone-tbl-wrap">
             <table class="zone-tbl">
               <thead><tr><th>Zone</th><th>Fuel Qty (ton)</th><th>Avg. Dist (m)</th><th>Days</th><th>End Date</th><th>Cost (THB)</th></tr></thead>
               <tbody id="out-zone-table"></tbody>
@@ -877,6 +932,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
                 <td id="out-total-cost-tbl" style="font-weight:700;color:#ea580c">—</td>
               </tr></tfoot>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1108,7 +1164,7 @@ const SIDEBAR_KEY = 'fym_sidebar_collapsed';
 function toggleSidebar(){
   const sb = document.getElementById('sidebar');
   const isCollapsed = sb.classList.toggle('collapsed');
-  localStorage.setItem(SIDEBAR_KEY, isCollapsed ? '1' : '0');
+  try{ localStorage.setItem(SIDEBAR_KEY, isCollapsed ? '1' : '0'); }catch(e){}
   updateCollapseIcon(isCollapsed);
 }
 function updateCollapseIcon(collapsed){
@@ -1120,27 +1176,63 @@ function updateCollapseIcon(collapsed){
   }
 }
 function initSidebarState(){
-  const saved = localStorage.getItem(SIDEBAR_KEY);
-  if(saved === '1'){
-    const sb = document.getElementById('sidebar');
-    sb.classList.add('collapsed');
-    updateCollapseIcon(true);
-  }
+  try{
+    const saved = localStorage.getItem(SIDEBAR_KEY);
+    if(saved === '1'){
+      const sb = document.getElementById('sidebar');
+      if(sb) sb.classList.add('collapsed');
+      updateCollapseIcon(true);
+    }
+  }catch(e){}
 }
 
 // ===== MOBILE SIDEBAR =====
 function toggleMobileSidebar(){
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('sidebar-overlay');
+  if(!sb||!ov) return;
   const isOpen = sb.classList.toggle('mobile-open');
   ov.classList.toggle('open', isOpen);
+  // Prevent body scroll when sidebar is open
+  document.body.style.overflow = isOpen ? 'hidden' : '';
 }
 function closeMobileSidebar(){
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('sidebar-overlay');
+  if(!sb||!ov) return;
   sb.classList.remove('mobile-open');
   ov.classList.remove('open');
+  document.body.style.overflow = '';
 }
+
+// Close sidebar on overlay tap — add both click AND touchend for reliability
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const ov = document.getElementById('sidebar-overlay');
+    if(ov){
+      ov.addEventListener('click', closeMobileSidebar);
+      ov.addEventListener('touchend', function(e){
+        e.preventDefault();
+        closeMobileSidebar();
+      }, {passive:false});
+    }
+    // Hamburger: add touchstart for instant response
+    const hb = document.getElementById('hamburger-btn');
+    if(hb){
+      hb.addEventListener('touchstart', function(e){
+        e.preventDefault();
+        toggleMobileSidebar();
+      }, {passive:false});
+    }
+    // Sidebar nav buttons: add touchend for instant response on mobile
+    document.querySelectorAll('.tab-btn[data-label]').forEach(function(btn){
+      btn.addEventListener('touchend', function(e){
+        // Let the onclick fire naturally — don't preventDefault here
+        // This ensures iOS doesn't have 300ms delay
+      }, {passive:true});
+    });
+  });
+})();
 
 // Init on load
 initSidebarState();
