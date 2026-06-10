@@ -153,6 +153,74 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   pointer-events:auto; /* only intercept taps when actually open */
 }
 
+/* ── Zone cards (mobile alternative to table) — base: hidden on desktop ── */
+/* MUST be declared BEFORE the mobile media query so the media query can override */
+.zone-cards{display:none}
+.zone-card{background:white;border:1px solid var(--border);border-radius:7px;padding:10px;margin-bottom:8px}
+.zone-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.zone-card-name{font-size:13px;font-weight:700;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:4px}
+.zone-card-days{font-size:16px;font-weight:800;color:var(--green)}
+.zone-card-days span{font-size:10px;font-weight:500;color:var(--gray-mid)}
+.zone-card-body{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.zone-card-field{background:var(--gray-bg);border-radius:5px;padding:6px 8px}
+.zcf-label{font-size:9px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px}
+.zcf-input{width:100%;border:1.5px solid var(--yellow-border);border-radius:4px;padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--gray-dark);background:var(--yellow-bg);font-weight:600}
+.zcf-input:focus{outline:none;border-color:var(--green)}
+.zcf-value{font-size:13px;font-weight:600;color:var(--gray-dark)}
+.zone-card-footer{margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.zone-card-cost{font-size:11px;font-weight:600;color:#ea580c}
+.zone-card-end{font-size:10px;color:var(--gray-mid)}
+.zone-cards-footer{background:var(--green-light);border-radius:7px;padding:10px;margin-top:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.zcf-total-label{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase}
+.zcf-total-val{font-size:13px;font-weight:700;color:var(--green)}
+
+/* ── Accordion Panel ── */
+.accordion-panel{background:#fff;border-radius:9px;border:2px solid #0891b2;box-shadow:0 2px 10px rgba(8,145,178,0.10);margin-top:12px;overflow:hidden}
+.accordion-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;cursor:pointer;user-select:none;
+  background:#fff;transition:background 0.15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  gap:8px;
+}
+.accordion-header:hover{background:#f0fbff}
+.accordion-header:active{background:#e0f5ff}
+.accordion-title{
+  display:flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:600;color:var(--gray-dark);flex:1;min-width:0;flex-wrap:wrap;
+}
+.accordion-title::before{
+  content:'FORECAST';font-size:8px;font-weight:800;
+  background:#0891b2;color:#fff;padding:1px 5px;border-radius:3px;
+  flex-shrink:0;
+}
+.accordion-title i{color:#0891b2;font-size:16px;flex-shrink:0}
+.accordion-title small{font-size:10px;font-weight:400;color:var(--gray-mid)}
+.accordion-icon{
+  font-size:18px;color:var(--gray-mid);flex-shrink:0;
+  transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.accordion-panel.open .accordion-icon{transform:rotate(180deg)}
+.accordion-body{
+  /* Height animation using max-height trick */
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.35s cubic-bezier(0.4,0,0.2,1),
+             padding 0.2s ease;
+  padding:0 14px;
+}
+.accordion-panel.open .accordion-body{
+  max-height:4000px; /* large enough for any content */
+  padding:0 14px 14px;
+}
+
+/* ── Mobile breakpoint (overrides above) ── */
+@media(max-width:700px){
+  /* Default collapsed on mobile — JS adds .open on user tap */
+  /* (accordion-panel starts without .open class on mobile) */
+}
+
 /* hamburger in header */
 .btn-hamburger{
   display:none;align-items:center;justify-content:center;
@@ -256,10 +324,10 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   .boiler-input{min-height:40px;padding:6px 8px}
   select,input[type=number],input[type=date]{min-height:40px}
 
-  /* ── Zone table → stacked cards on mobile ── */
-  .zone-tbl-wrap{overflow:visible}
-  .zone-tbl{display:none} /* hide desktop table */
-  .zone-cards{display:block} /* show mobile cards */
+  /* ── Zone table: hide on mobile, show cards instead ── */
+  .zone-tbl-wrap{overflow:hidden;height:0;padding:0;margin:0} /* fully hidden */
+  .zone-tbl{display:none}
+  .zone-cards{display:block !important} /* show mobile cards — !important beats base :display:none */
 
   /* ── Section titles ── */
   .section-title{font-size:12px;flex-wrap:wrap}
@@ -275,26 +343,6 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   .boiler-unit{min-width:unset !important}
   .boiler-label{min-width:unset !important}
 }
-
-/* ── Zone cards (mobile alternative to table) ── */
-.zone-cards{display:none} /* hidden on desktop */
-.zone-card{background:white;border:1px solid var(--border);border-radius:7px;padding:10px;margin-bottom:8px}
-.zone-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.zone-card-name{font-size:13px;font-weight:700;color:var(--gray-dark);background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:4px}
-.zone-card-days{font-size:16px;font-weight:800;color:var(--green)}
-.zone-card-days span{font-size:10px;font-weight:500;color:var(--gray-mid)}
-.zone-card-body{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.zone-card-field{background:var(--gray-bg);border-radius:5px;padding:6px 8px}
-.zcf-label{font-size:9px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px}
-.zcf-input{width:100%;border:1.5px solid var(--yellow-border);border-radius:4px;padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--gray-dark);background:var(--yellow-bg);font-weight:600}
-.zcf-input:focus{outline:none;border-color:var(--green)}
-.zcf-value{font-size:13px;font-weight:600;color:var(--gray-dark)}
-.zone-card-footer{margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--gray-mid)}
-.zone-card-cost{font-size:11px;font-weight:600;color:#ea580c}
-.zone-card-end{font-size:10px;color:var(--gray-mid)}
-.zone-cards-footer{background:var(--green-light);border-radius:7px;padding:10px;margin-top:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
-.zcf-total-label{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase}
-.zcf-total-val{font-size:13px;font-weight:700;color:var(--green)}
 
 /* MAIN */
 .main-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;-webkit-overflow-scrolling:touch;min-width:0}
@@ -822,24 +870,35 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
             </div>
           </div>
 
-          <div class="panel panel-forecast" style="margin-top:12px">
-            <div class="section-title"><i class="ti ti-table"></i>Indoor Zone Fuel Inventory <small style="color:var(--gray-mid);font-weight:400;font-size:10px">(แก้ไขได้ — คำนวณอัตโนมัติ)</small></div>
-            <div class="zone-tbl-wrap">
-            <table class="zone-tbl">
-              <thead><tr><th>Zone</th><th>Fuel Qty (ton)</th><th>Avg. Dist (m)</th><th>Days</th><th>End Date</th><th>Cost (THB)</th></tr></thead>
-              <tbody id="in-zone-table"></tbody>
-              <tfoot><tr>
-                <td colspan="1"><b>รวม</b></td>
-                <td id="in-total-qty" style="font-weight:700">—</td>
-                <td>—</td>
-                <td id="in-total-days" style="font-weight:700;color:var(--green)">—</td>
-                <td id="in-final-end" style="font-weight:700;color:#0891b2">—</td>
-                <td id="in-total-cost-tbl" style="font-weight:700;color:#ea580c">—</td>
-              </tr></tfoot>
-            </table>
+          <!-- ── Indoor Zone Inventory (Accordion) ── -->
+          <div class="accordion-panel" id="acc-in">
+            <div class="accordion-header" onclick="toggleAccordion('acc-in')" role="button" aria-expanded="true">
+              <div class="accordion-title">
+                <i class="ti ti-table"></i>
+                Indoor Zone Fuel Inventory
+                <small>(แก้ไขได้ — คำนวณอัตโนมัติ)</small>
+              </div>
+              <i class="ti ti-chevron-down accordion-icon"></i>
             </div>
-            <!-- Mobile: zone cards -->
-            <div class="zone-cards" id="in-zone-cards"></div>
+            <div class="accordion-body">
+              <!-- Desktop table -->
+              <div class="zone-tbl-wrap">
+                <table class="zone-tbl">
+                  <thead><tr><th>Zone</th><th>Fuel Qty (ton)</th><th>Avg. Dist (m)</th><th>Days</th><th>End Date</th><th>Cost (THB)</th></tr></thead>
+                  <tbody id="in-zone-table"></tbody>
+                  <tfoot><tr>
+                    <td><b>รวม</b></td>
+                    <td id="in-total-qty" style="font-weight:700">—</td>
+                    <td>—</td>
+                    <td id="in-total-days" style="font-weight:700;color:var(--green)">—</td>
+                    <td id="in-final-end" style="font-weight:700;color:#0891b2">—</td>
+                    <td id="in-total-cost-tbl" style="font-weight:700;color:#ea580c">—</td>
+                  </tr></tfoot>
+                </table>
+              </div>
+              <!-- Mobile zone cards -->
+              <div class="zone-cards" id="in-zone-cards"></div>
+            </div>
           </div>
         </div>
 
@@ -1013,24 +1072,35 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
             </div>
           </div>
 
-          <div class="panel panel-forecast" style="margin-top:12px">
-            <div class="section-title"><i class="ti ti-table"></i>Outdoor Zone Fuel Inventory <small style="color:var(--gray-mid);font-weight:400;font-size:10px">(แก้ไขได้ — คำนวณอัตโนมัติ)</small></div>
-            <div class="zone-tbl-wrap">
-            <table class="zone-tbl">
-              <thead><tr><th>Zone</th><th>Fuel Qty (ton)</th><th>Avg. Dist (m)</th><th>Days</th><th>End Date</th><th>Cost (THB)</th></tr></thead>
-              <tbody id="out-zone-table"></tbody>
-              <tfoot><tr>
-                <td colspan="1"><b>รวม</b></td>
-                <td id="out-total-qty" style="font-weight:700">—</td>
-                <td>—</td>
-                <td id="out-total-days" style="font-weight:700;color:var(--green)">—</td>
-                <td id="out-final-end" style="font-weight:700;color:#0891b2">—</td>
-                <td id="out-total-cost-tbl" style="font-weight:700;color:#ea580c">—</td>
-              </tr></tfoot>
-            </table>
+          <!-- ── Outdoor Zone Inventory (Accordion) ── -->
+          <div class="accordion-panel" id="acc-out">
+            <div class="accordion-header" onclick="toggleAccordion('acc-out')" role="button" aria-expanded="true">
+              <div class="accordion-title">
+                <i class="ti ti-table"></i>
+                Outdoor Zone Fuel Inventory
+                <small>(แก้ไขได้ — คำนวณอัตโนมัติ)</small>
+              </div>
+              <i class="ti ti-chevron-down accordion-icon"></i>
             </div>
-            <!-- Mobile: zone cards -->
-            <div class="zone-cards" id="out-zone-cards"></div>
+            <div class="accordion-body">
+              <!-- Desktop table -->
+              <div class="zone-tbl-wrap">
+                <table class="zone-tbl">
+                  <thead><tr><th>Zone</th><th>Fuel Qty (ton)</th><th>Avg. Dist (m)</th><th>Days</th><th>End Date</th><th>Cost (THB)</th></tr></thead>
+                  <tbody id="out-zone-table"></tbody>
+                  <tfoot><tr>
+                    <td><b>รวม</b></td>
+                    <td id="out-total-qty" style="font-weight:700">—</td>
+                    <td>—</td>
+                    <td id="out-total-days" style="font-weight:700;color:var(--green)">—</td>
+                    <td id="out-final-end" style="font-weight:700;color:#0891b2">—</td>
+                    <td id="out-total-cost-tbl" style="font-weight:700;color:#ea580c">—</td>
+                  </tr></tfoot>
+                </table>
+              </div>
+              <!-- Mobile zone cards -->
+              <div class="zone-cards" id="out-zone-cards"></div>
+            </div>
           </div>
         </div>
 
@@ -1332,8 +1402,33 @@ function closeMobileSidebar(){
   });
 })();
 
+// ===== ACCORDION =====
+function toggleAccordion(id){
+  const panel = document.getElementById(id);
+  if(!panel) return;
+  const isOpen = panel.classList.toggle('open');
+  const header = panel.querySelector('.accordion-header');
+  if(header) header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+function initAccordions(){
+  const isMobile = window.innerWidth <= 700;
+  ['acc-in','acc-out'].forEach(id=>{
+    const panel = document.getElementById(id);
+    if(!panel) return;
+    if(!isMobile){
+      // Desktop: open by default
+      panel.classList.add('open');
+      const h = panel.querySelector('.accordion-header');
+      if(h) h.setAttribute('aria-expanded','true');
+    }
+    // Mobile: closed by default (no .open class added)
+  });
+}
+
 // Init on load
 initSidebarState();
+initAccordions();
 
 // ===== BOILER RENDERERS =====
 function renderBoilerList(containerId, arr, arrName, calcFn){
