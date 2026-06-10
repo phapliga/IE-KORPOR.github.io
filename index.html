@@ -27,16 +27,17 @@ input[type=number]{-moz-appearance:textfield}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
 /* HEADER */
-.header{background:var(--gray-dark);color:white;padding:0 18px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,0.25)}
-.header-left{display:flex;align-items:center;gap:10px}
+.header{background:var(--gray-dark);color:white;padding:0 12px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,0.25);min-width:0}
+.header-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
 .logo-box{width:34px;height:34px;background:var(--green);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-box i{font-size:18px;color:white}
-.brand-title{font-size:14px;font-weight:700;color:white}
-.brand-sub{font-size:10px;color:rgba(255,255,255,0.5);font-weight:300}
-.header-right{display:flex;align-items:center;gap:8px}
-.datetime-date{font-size:12px;font-weight:600;color:white}
-.datetime-time{font-size:10px;color:rgba(255,255,255,0.5);text-align:right}
-.btn-header{display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;cursor:pointer;font-size:11px;font-weight:500;transition:background 0.15s;font-family:var(--font)}
+.header-brand{min-width:0;overflow:hidden}
+.brand-title{font-size:13px;font-weight:700;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-sub{font-size:9px;color:rgba(255,255,255,0.5);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.datetime-date{font-size:11px;font-weight:600;color:white;white-space:nowrap}
+.datetime-time{font-size:9px;color:rgba(255,255,255,0.5);text-align:right}
+.btn-header{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:white;cursor:pointer;font-size:11px;font-weight:500;transition:background 0.15s;font-family:var(--font);white-space:nowrap}
 .btn-header:hover{background:rgba(255,255,255,0.18)}
 
 /* GLOBAL KPI */
@@ -169,11 +170,25 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   .btn-hamburger{display:flex}
   #sidebar-collapse-btn{display:none !important}
 
-  /* Body: don't block scrolling */
-  body{overflow-x:hidden;-webkit-overflow-scrolling:touch}
+  /* ── Body ── */
+  body{overflow-x:hidden}
 
+  /* ── Header ── */
+  .header{padding:0 8px;height:50px}
+  .header-left{gap:6px}
+  .logo-box{width:30px;height:30px;flex-shrink:0}
+  .logo-box i{font-size:15px}
+  .brand-title{font-size:11px}
+  .brand-sub{display:none}
+  .hdr-datetime{display:none} /* hide date/time on very small screens */
+  .header-right{gap:4px}
+  .btn-header{padding:5px 8px;font-size:10px}
+  .btn-print-label{display:none} /* icon only on mobile */
+  #sidebar-collapse-btn{display:none !important}
+
+  /* ── Sidebar (slide-in) ── */
   .sidebar{
-    position:fixed;top:54px;left:0;bottom:0;
+    position:fixed;top:50px;left:0;bottom:0;
     width:var(--sb-mobile) !important;
     transform:translateX(-100%);
     transition:transform var(--sb-transition);
@@ -183,24 +198,103 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
     -webkit-overflow-scrolling:touch;
   }
   .sidebar.mobile-open{transform:translateX(0)}
-
-  /* Overlay: use display:block always on mobile, controlled by pointer-events+opacity */
   .sidebar-overlay{display:block !important}
-
-  /* Always show labels on mobile regardless of collapsed state */
   .sidebar .btn-label{opacity:1 !important;width:auto !important;margin:unset !important}
   .sidebar .tab-badge{opacity:1 !important;width:auto !important;padding:1px 5px !important;margin-left:auto !important}
   .sidebar .tab-btn{justify-content:flex-start !important;gap:9px !important;padding:10px 12px !important;min-height:48px !important}
   .sidebar .sidebar-label{opacity:1 !important}
   .sidebar-toggle-btn{display:none}
 
-  /* Touch targets: minimum 44px for all interactive elements */
-  .tab-btn,.btn-add,.btn-remove,.type-btn,.btn-header{min-height:44px;min-width:44px}
-  .boiler-input{min-height:44px}
+  /* ── Main content ── */
+  .main-content{padding:8px;-webkit-overflow-scrolling:touch}
 
-  /* Fuel props: 2 columns on mobile */
+  /* ── Panels ── */
+  .panel,.panel-input,.panel-result,.panel-forecast{padding:10px;border-radius:7px}
+
+  /* ── Grids: always single column ── */
+  .two-col,.three-col{grid-template-columns:1fr !important;gap:10px}
+  .input-row{grid-template-columns:1fr 1fr;gap:7px} /* keep 2-col for inputs — they're short labels */
+
+  /* ── Boiler rows ── */
+  .boiler-row{flex-wrap:wrap;gap:5px}
+  .boiler-label{min-width:unset;font-size:10px}
+  .boiler-unit{min-width:unset;font-size:9px}
+
+  /* ── Result cards ── */
+  .result-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .rc-value{font-size:16px !important}
+  .panel-result .rc-value{font-size:18px !important}
+
+  /* ── KPI forecast grid: 2 columns ── */
+  .fkpi-grid{grid-template-columns:repeat(2,1fr) !important;gap:6px}
+  .fkpi{padding:8px 6px}
+  .fkpi-val{font-size:14px}
+  .fkpi.green-hi .fkpi-val{font-size:17px}
+  .fkpi.amber-hi .fkpi-val{font-size:15px}
+
+  /* ── Hero cards ── */
+  .hero-dozer .hd-num{font-size:42px}
+  .hero-cost{flex-direction:column;gap:10px;text-align:center}
+  .hero-cost .hc-num{font-size:26px}
+  .hero-cost .hc-right{width:100%}
+
+  /* ── Total cost / end date banners ── */
+  .total-cost-banner,.end-date-banner{flex-direction:column;gap:8px;padding:12px}
+  .tcb-left .tcb-num{font-size:22px}
+  .edb-val{font-size:18px}
+
+  /* ── Fuel section ── */
   .fuel-props{grid-template-columns:1fr 1fr !important}
+  .fuel-header{flex-wrap:wrap;gap:5px}
+  .type-toggle{flex-wrap:wrap;gap:3px}
+  .type-btn{padding:4px 8px;font-size:10px;min-height:32px}
+  .ratio-row{gap:5px}
+  .ratio-input{width:55px}
+
+  /* ── Touch targets ── */
+  .btn-add,.btn-remove{min-height:40px}
+  .boiler-input{min-height:40px;padding:6px 8px}
+  select,input[type=number],input[type=date]{min-height:40px}
+
+  /* ── Zone table → stacked cards on mobile ── */
+  .zone-tbl-wrap{overflow:visible}
+  .zone-tbl{display:none} /* hide desktop table */
+  .zone-cards{display:block} /* show mobile cards */
+
+  /* ── Section titles ── */
+  .section-title{font-size:12px;flex-wrap:wrap}
+  .section-title small{font-size:9px}
+
+  /* ── Progress section ── */
+  .progress-section{padding:8px}
+
+  /* ── Zone map widget ── */
+  .zone-map-widget{margin-top:8px}
+
+  /* ── Remove min-width constraints ── */
+  .boiler-unit{min-width:unset !important}
+  .boiler-label{min-width:unset !important}
 }
+
+/* ── Zone cards (mobile alternative to table) ── */
+.zone-cards{display:none} /* hidden on desktop */
+.zone-card{background:white;border:1px solid var(--border);border-radius:7px;padding:10px;margin-bottom:8px}
+.zone-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.zone-card-name{font-size:13px;font-weight:700;color:var(--gray-dark);background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:4px}
+.zone-card-days{font-size:16px;font-weight:800;color:var(--green)}
+.zone-card-days span{font-size:10px;font-weight:500;color:var(--gray-mid)}
+.zone-card-body{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.zone-card-field{background:var(--gray-bg);border-radius:5px;padding:6px 8px}
+.zcf-label{font-size:9px;color:var(--gray-mid);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px}
+.zcf-input{width:100%;border:1.5px solid var(--yellow-border);border-radius:4px;padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--gray-dark);background:var(--yellow-bg);font-weight:600}
+.zcf-input:focus{outline:none;border-color:var(--green)}
+.zcf-value{font-size:13px;font-weight:600;color:var(--gray-dark)}
+.zone-card-footer{margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--gray-mid)}
+.zone-card-cost{font-size:11px;font-weight:600;color:#ea580c}
+.zone-card-end{font-size:10px;color:var(--gray-mid)}
+.zone-cards-footer{background:var(--green-light);border-radius:7px;padding:10px;margin-top:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.zcf-total-label{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase}
+.zcf-total-val{font-size:13px;font-weight:700;color:var(--green)}
 
 /* MAIN */
 .main-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;-webkit-overflow-scrolling:touch;min-width:0}
@@ -233,7 +327,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .boiler-label{font-size:11px;font-weight:700;color:var(--gray-dark);min-width:56px}
 .boiler-input{flex:1;padding:7px 8px;border:1.5px solid var(--yellow-border);border-radius:5px;font-size:15px;font-weight:700;font-family:var(--font);color:var(--gray-dark);background:white;text-align:right}
 .boiler-input:focus{outline:none;border-color:var(--green)}
-.boiler-unit{font-size:10px;color:var(--gray-mid);white-space:nowrap;min-width:66px}
+.boiler-unit{font-size:10px;color:var(--gray-mid);white-space:nowrap}
 .btn-remove{background:none;border:none;color:#fca5a5;cursor:pointer;padding:3px;border-radius:4px;display:flex;align-items:center;flex-shrink:0}
 .btn-remove:hover{color:var(--red);background:#fee2e2}
 .btn-add{display:flex;align-items:center;gap:5px;padding:7px 12px;border:1.5px dashed var(--border);border-radius:var(--radius);background:none;color:var(--gray-mid);cursor:pointer;font-size:11px;font-family:var(--font);width:100%;justify-content:center;transition:all 0.15s;margin-top:3px}
@@ -330,7 +424,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .zone-tbl th{background:var(--gray-dark);color:white;padding:7px 9px;text-align:left;font-weight:500;font-size:10px}
 .zone-tbl td{padding:5px 9px;border-bottom:1px solid var(--border);vertical-align:middle}
 .zone-tbl tr:hover td{background:#f8fffe}
-.zone-tbl input{border:1px solid var(--yellow-border);border-radius:4px;padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--gray-dark);background:var(--yellow-bg);font-weight:600}
+.zone-tbl input{border:1px solid var(--yellow-border);border-radius:4px;padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--gray-dark);background:var(--yellow-bg);font-weight:600;max-width:100%;width:80px}
 .zone-tbl input:focus{outline:none;border-color:var(--green)}
 .zone-tbl .td-days{font-size:12px;font-weight:700;color:var(--green);text-align:right}
 .zone-tbl .td-end{font-size:11px;color:var(--gray-mid)}
@@ -445,17 +539,17 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
       <i class="ti ti-layout-sidebar-left-collapse" id="sidebar-collapse-icon"></i>
     </button>
     <div class="logo-box"><i class="ti ti-building-factory-2"></i></div>
-    <div>
+    <div class="header-brand">
       <div class="brand-title">FUEL YARD MANAGEMENT SYSTEM</div>
       <div class="brand-sub">Bulldozer Calculation &amp; Fuel Forecasting</div>
     </div>
   </div>
   <div class="header-right">
-    <div style="text-align:right;margin-right:6px">
+    <div style="text-align:right;margin-right:4px" class="hdr-datetime">
       <div class="datetime-date" id="hdr-date">—</div>
       <div class="datetime-time" id="hdr-time">—</div>
     </div>
-    <button class="btn-header" onclick="window.print()"><i class="ti ti-printer"></i>Print Report</button>
+    <button class="btn-header" onclick="window.print()"><i class="ti ti-printer"></i><span class="btn-print-label">Print</span></button>
   </div>
 </div>
 
@@ -690,7 +784,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
               </div>
               <div class="fuel-props">
                 <div class="prop-box"><div class="prop-label">LHV (kJ/kg)</div><input class="prop-input" type="number" id="in-bag-lhv" value="7700" oninput="calcForecast('in')"></div>
-                <div class="prop-box"><div class="prop-label">Density (kg/m³)</div><input class="prop-input" type="number" id="in-bag-density" value="240" oninput="calcForecast('in')"></div>
+                <div class="prop-box"><div class="prop-label">Density (kg/m³)</div><input class="prop-input" type="number" id="in-bag-density" value="315" oninput="calcForecast('in')"></div>
                 <div class="prop-box" style="background:var(--green-light);border-color:#a7f3c2"><div class="prop-label">Required</div><div class="prop-input" id="in-bag-required" style="color:var(--green);font-weight:700">0</div><div class="prop-unit">ton/hr</div></div>
               </div>
             </div>
@@ -744,6 +838,8 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
               </tr></tfoot>
             </table>
             </div>
+            <!-- Mobile: zone cards -->
+            <div class="zone-cards" id="in-zone-cards"></div>
           </div>
         </div>
 
@@ -933,6 +1029,8 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
               </tr></tfoot>
             </table>
             </div>
+            <!-- Mobile: zone cards -->
+            <div class="zone-cards" id="out-zone-cards"></div>
           </div>
         </div>
 
@@ -1393,9 +1491,9 @@ function initZoneTable(mode){
   tbody.innerHTML = zones.map((z,i)=>`
     <tr id="${p}-zrow-${i}">
       <td style="font-weight:700;font-size:11px">${z.name}</td>
-      <td><input type="number" id="${p}-z-qty-${i}" value="${z.qty}" style="width:100px"
+      <td><input type="number" id="${p}-z-qty-${i}" value="${z.qty}"
         oninput="${arrName}[${i}].qty=+this.value;${calcFn}()"></td>
-      <td><input type="number" id="${p}-z-dist-${i}" value="${z.dist}" style="width:72px"
+      <td><input type="number" id="${p}-z-dist-${i}" value="${z.dist}"
         oninput="${arrName}[${i}].dist=+this.value;${calcFn}()"></td>
       <td class="td-days" id="${p}-z-days-${i}">—</td>
       <td class="td-end" id="${p}-z-end-${i}">—</td>
@@ -1429,6 +1527,7 @@ function recalcZoneTable(mode, params){
 
   let currentMs = startMs;
   let grandCost = 0, grandDays = 0, totalQty = 0;
+  const cardData = [];
 
   zones.forEach((z,i)=>{
     const netDist = getNetDist(z.dist, mobilePerUnit, mobileCount);
@@ -1441,15 +1540,18 @@ function recalcZoneTable(mode, params){
     currentMs = endMs;
     grandCost += cost; grandDays += days; totalQty += z.qty;
 
+    // Update desktop table cells
     const dEl = document.getElementById(`${p}-z-days-${i}`);
     const eEl = document.getElementById(`${p}-z-end-${i}`);
     const cEl = document.getElementById(`${p}-z-cost-${i}`);
     if(dEl) dEl.textContent = days.toFixed(1);
     if(eEl) eEl.textContent = fmtDate(new Date(endMs));
     if(cEl) cEl.textContent = fmt(Math.round(cost));
+
+    cardData.push({name:z.name, qty:z.qty, dist:z.dist, days, endMs, cost, i});
   });
 
-  // Update footer
+  // Update desktop table footer
   const grandEnd = new Date(startMs + grandDays*24*3600*1000);
   const tq = document.getElementById(`${p}-total-qty`);
   const td = document.getElementById(`${p}-total-days`);
@@ -1465,6 +1567,41 @@ function recalcZoneTable(mode, params){
   const ge = document.getElementById(`${p}-grand-enddate`);
   if(gt) gt.textContent = fmt(Math.round(grandCost));
   if(ge) ge.textContent = fmtDate(grandEnd);
+
+  // ── Build mobile zone cards ──
+  const cardContainer = document.getElementById(`${p}-zone-cards`);
+  if(cardContainer){
+    const arrName = mode==='in'?'indoorZones':'outdoorZones';
+    const calcFn  = mode==='in'?'calcForecastIn':'calcForecastOut';
+    cardContainer.innerHTML = cardData.map(cd=>`
+      <div class="zone-card">
+        <div class="zone-card-header">
+          <span class="zone-card-name">${cd.name}</span>
+          <span class="zone-card-days">${cd.days.toFixed(1)}<span> days</span></span>
+        </div>
+        <div class="zone-card-body">
+          <div class="zone-card-field">
+            <div class="zcf-label">Fuel Qty (ton)</div>
+            <input class="zcf-input" type="number" value="${cd.qty}"
+              oninput="${arrName}[${cd.i}].qty=+this.value;${calcFn}()">
+          </div>
+          <div class="zone-card-field">
+            <div class="zcf-label">Avg. Dist (m)</div>
+            <input class="zcf-input" type="number" value="${cd.dist}"
+              oninput="${arrName}[${cd.i}].dist=+this.value;${calcFn}()">
+          </div>
+        </div>
+        <div class="zone-card-footer">
+          <span class="zone-card-end">🏁 ${fmtDate(new Date(cd.endMs))}</span>
+          <span class="zone-card-cost">฿${fmt(Math.round(cd.cost))}</span>
+        </div>
+      </div>`).join('')
+    + `<div class="zone-cards-footer">
+        <div><div class="zcf-total-label">รวมทั้งหมด</div><div class="zcf-total-val">${fmt(totalQty)} ton</div></div>
+        <div><div class="zcf-total-label">รวม days</div><div class="zcf-total-val">${grandDays.toFixed(1)} d</div></div>
+        <div><div class="zcf-total-label">รวมค่าใช้จ่าย</div><div class="zcf-total-val" style="color:#ea580c">฿${fmt(Math.round(grandCost))}</div></div>
+      </div>`;
+  }
 }
 
 // ===== READ ALL PARAMS FOR A MODE =====
